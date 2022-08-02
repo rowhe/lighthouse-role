@@ -1,0 +1,27 @@
+---
+- name: Creating "files" directory
+  ansible.builtin.file:
+    path: ./files
+    state: directory
+    mode: 0755
+- name: Downloading lighthouse
+  ansible.builtin.get_url:
+    url: https://github.com/VKCOM/lighthouse/archive/refs/heads/master.zip
+    dest: ./files/lighthouse.zip
+    mode: 0644
+- name: Unarchiving Lighthouse
+  ansible.builtin.unarchive:
+    src: ./files/lighthouse.zip
+    dest: ./files
+    remote_src: true
+- name: Copying lighthouse files to /var/www
+  ansible.builtin.copy:
+    src: ./files/lighthouse-master
+    dest: /var/www
+    mode: preserve
+    remote_src: true
+- name: Enabling lighthouse site in nginx config file
+  ansible.builtin.copy:
+    src: templates/nginx_sites_enabled.conf.j2
+    dest: /etc/nginx/sites-available/default
+    mode: 0644
